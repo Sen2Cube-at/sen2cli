@@ -1,0 +1,1 @@
+from .sen2cli import cli
