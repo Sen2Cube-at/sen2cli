@@ -6,7 +6,7 @@
 
 Commandline interface for Sen2Cube.at backend.
 
-## Installation
+## 🔧 Installation
 Install within your current Python environment:
 ```
 pip install git+https://github.com/ZGIS/sen2cli.git@main
@@ -14,10 +14,15 @@ pip install git+https://github.com/ZGIS/sen2cli.git@main
 
 Run in a Docker container
 ```
-wget .../Dockerfile
-docker run ...
+docker build -t sen2cli:latest .
+docker run -it --name sen2cli \
+  -v "$(pwd)"/host_data:/home/sen2cli/host_data \
+  sen2cli:latest /bin/bash
+  
+docker rm sen2cli
 ```
-## Usage
+
+## 🔰 Basic Usage
 ```
 sen2cli --help
 sen2cli session --help
@@ -37,15 +42,23 @@ sen2cli inference list --raw_modifier="<filterstring>"
 
 sen2cli inference rerun --id=<id>
 sen2cli inference abort --id=<id>
-sen2cli inference delete --id=<id> --knowledgebase_id=123 --force --dryrun
 
 sen2cli inference rerun --id=7769 --id=7770 --id=7771 --id=7772
 sen2cli inference abort --id=7769 --id=7770 --id=7771 --id=7772
 
-find sen2cli -name "*.geojson" -exec sen2cli inference create 221 1 2020-03-01 2020-08-01 {} --description="{}" \;
+sen2cli inference create 221 1 2020-03-01 2020-08-01 ./aoi.geojson --description="Very descriptive"
+```
 
-##wild ideas
-sen2cli inference create 221 1 2020-03-01 2020-08-01 ./aoi.geojson --description="blablaba"
+## Advanced usage (on Unix)
+
+Create inference for specific files in a folder
+```
+find ./data -name "id_503*.geojson" -exec sen2cli inference create 221 1 2020-03-01 2020-08-01 {} --description="{}" \;
+```
+
+## Todo and wild ideas
+```
+sen2cli inference delete --id=<id> --knowledgebase_id=123 --force --dryrun
 
 sen2cli inference download --id=123 --id=321     ##all incl qgis_proj
 sen2cli inference download --id=123 --id=321 --include_qgis_project=TRUE/FALSE --result="result1" --result="greeness_no_cloud"
@@ -57,7 +70,7 @@ sen2cli knowledgebase list
 sen2cli factbase list
 ```
 
-# License
+#  License
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation, either version 3 of the License, or
