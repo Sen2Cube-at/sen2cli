@@ -1,6 +1,7 @@
 # Sen2CLI inference module click group / commands
 import logging
 from io import TextIOWrapper
+from typing import List
 
 import click
 
@@ -15,9 +16,22 @@ from ..utils import csv_from_dictlist, dict_from_resource
 logger = logging.getLogger(__name__)
 
 
+def _click_echo_output(output_format: str, resources: List[dict]):
+  """Print output to whatever click.echo points in the correct format."""
+  if output_format == 'csv':
+    click.echo(csv_from_dictlist(resources, with_headers=True))
+  elif output_format == 'csv_no_hdr':
+    click.echo(csv_from_dictlist(resources, with_headers=False))
+  elif output_format == 'json':
+    click.echo(resources)
+  else:
+    raise ValueError(f'Unsupported output_format: {output_format}')
+
+
 class InferenceCommandConfig(object):
   def __init__(self):
     self.tokenfile = None
+    self.output_format = None
 
 
 inference_command_config = click \
@@ -30,15 +44,18 @@ inference_command_config = click \
               show_envvar=True,
               type=click.Path(exists=False, file_okay=True, dir_okay=False, writable=True, readable=True),
               default=CONFIG_PATH_TOKENFILE)
+@click.option('--output_format', '-f', help="Specify output format (CSV, CSV without header, JSON)",
+              type=click.Choice(['csv', 'csv_no_hdr', 'json']), default='csv')
 @inference_command_config
-def inference(inference_command_config, tokenfile):
+def inference(inference_command_config: InferenceCommandConfig,
+              tokenfile,
+              output_format: str):
   inference_command_config.tokenfile = tokenfile
+  inference_command_config.output_format = output_format
   pass
 
 
 @inference.command(help="List inferences.")
-@click.option('--format', help="Specify output format (CSV, CSV without header, JSON)",
-              type=click.Choice(['csv', 'csv_no_hdr', 'json']), default='csv')
 @click.option('--id', help="Filter for inference ID",
               type=click.INT, multiple=True)
 @click.option('--factbase_id', help="Filter for factbase ID",
@@ -54,7 +71,6 @@ def inference(inference_command_config, tokenfile):
               type=click.STRING)
 @inference_command_config
 def ls(inference_command_config: InferenceCommandConfig,
-       format: str,
        id: int,
        factbase_id: int,
        knowledgebase_id: int,
@@ -67,15 +83,7 @@ def ls(inference_command_config: InferenceCommandConfig,
     inferences = get_inference(token, id=id, factbase_id=factbase_id, knowledgebase_id=knowledgebase_id, status=status,
                                sort_by=sort, raw_modifier=raw_modifier)
     resources = [dict_from_resource(res, DEFAULT_COLUMNS) for res in inferences]
-    if format == 'csv':
-      click.echo(csv_from_dictlist(resources, with_headers=True))
-    elif format == 'csv_no_hdr':
-      click.echo(csv_from_dictlist(resources, with_headers=False))
-    elif format == 'json':
-      click.echo(resources)
-    else:
-      raise
-
+    _click_echo_output(inference_command_config.output_format, resources)
   else:
     click.echo("Token was none")
 
@@ -90,7 +98,7 @@ def rerun(inference_command_config, id):
     token = load_or_refresh_token(inference_command_config.tokenfile, AUTH_TOKEN_URL, AUTH_CLIENT_ID)
     if not token is None:
       updated = update_inference(token, id, 'CREATED')
-      click.echo(f"Restarted inferences: {updated}.")
+      _click_echo_output(inference_command_config.output_format, updated)
     else:
       click.echo("Token was none")
 
@@ -105,7 +113,7 @@ def abort(inference_command_config, id):
     token = load_or_refresh_token(inference_command_config.tokenfile, AUTH_TOKEN_URL, AUTH_CLIENT_ID)
     if not token is None:
       updated = update_inference(token, id, 'ABORTED')
-      click.echo(f"Aborted inferences: {updated}.")
+      _click_echo_output(inference_command_config.output_format, updated)
     else:
       click.echo("Token was none")
 
