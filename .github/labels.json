@@ -1,0 +1,74 @@
+[
+  {
+    "name": "type: duplicate :gemini:",
+    "color": "#dddddd"
+  },
+  {
+    "name": "type: bug :bug:",
+    "color": "#fc2929"
+  },
+  {
+    "name": "type: question :question:",
+    "color": "#61b8c2"
+  },
+  {
+    "name": "type: good first issue :beginner:",
+    "color": "#61b8c2"
+  },
+  {
+    "name": "type: wont fix :coffin:",
+    "color": "#dddddd"
+  },
+  {
+    "name": "priority: normal",
+    "color": "#fbca04"
+  },
+  {
+    "name": "type: enhancement :sparkles:",
+    "color": "#369c6e"
+  },
+  {
+    "name": "affects: CI / build :construction_worker:",
+    "color": "#b89954"
+  },
+  {
+    "name": "type: help wanted :raising_hand:",
+    "color": "#61b8c2"
+  },
+  {
+    "name": "priority: high :rotating_light:",
+    "color": "#d93f0b"
+  },
+  {
+    "name": "affects: docker config / images :whale:",
+    "color": "#b89954"
+  },
+  {
+    "name": "affects: python :snake:",
+    "color": "#b89954"
+  },
+  {
+    "name": "affects: database / datamodel :card_file_box:",
+    "color": "#b89954"
+  },
+  {
+    "name": "priority: low",
+    "color": "#c2e0c6"
+  },
+  {
+    "name": "type: invalid :no_entry_sign:",
+    "color": "#dddddd"
+  },
+  {
+    "name": "affects: config :wrench:",
+    "color": "#b89954"
+  },
+  {
+    "name": "affects: documentation :memo:",
+    "color": "#b89954"
+  },
+  {
+    "name": "priority: critical :ambulance:",
+    "color": "#b60205"
+  }
+]
