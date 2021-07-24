@@ -24,7 +24,7 @@ inference_command_config = click \
   .make_pass_decorator(InferenceCommandConfig, ensure=True)
 
 
-@click.group()
+@click.group(help="Start/Stop/List/Delete etc inferences.")
 @click.option('--tokenfile', help="File that stores the token.",
               envvar="S2C_TOKENFILE",
               show_envvar=True,
@@ -36,27 +36,46 @@ def inference(inference_command_config, tokenfile):
   pass
 
 
-@inference.command()
-@click.option('--format', help="Specify output format", type=click.Choice(['csv', 'json']), default='csv')
-@click.option('--id', help="Filter for inference ID", type=click.INT, multiple=True)
-@click.option('--factbase_id', help="Filter for factbase ID", type=click.INT, multiple=True)
-@click.option('--knowledgebase_id', help="Filter for model ID", type=click.INT, multiple=True)
-@click.option('--status', help="Filter for status", type=click.Choice(INFERENCE_STATUS), multiple=True)
-@click.option('--sort', help="Columns to sort by. Example: owner,-knowledgebase_id", type=click.STRING, default="-id")
+@inference.command(help="List inferences.")
+@click.option('--format', help="Specify output format (CSV, CSV without header, JSON)",
+              type=click.Choice(['csv', 'csv_no_hdr', 'json']), default='csv')
+@click.option('--id', help="Filter for inference ID",
+              type=click.INT, multiple=True)
+@click.option('--factbase_id', help="Filter for factbase ID",
+              type=click.INT, multiple=True)
+@click.option('--knowledgebase_id', help="Filter for model ID",
+              type=click.INT, multiple=True)
+@click.option('--status', help="Filter for status",
+              type=click.Choice(INFERENCE_STATUS), multiple=True)
+@click.option('--sort', help="Columns to sort by. Example: owner,-knowledgebase_id",
+              type=click.STRING, default="-id")
 @click.option('--raw_modifier',
               help="This will be added to the query string and can be used to build lmore sophisticated filters etc.",
               type=click.STRING)
 @inference_command_config
-def list(inference_command_config, format, id, factbase_id, knowledgebase_id, status, sort, raw_modifier):
+def ls(inference_command_config: InferenceCommandConfig,
+       format: str,
+       id: int,
+       factbase_id: int,
+       knowledgebase_id: int,
+       status: str,
+       sort: str,
+       raw_modifier: str):
+  """Lists inferences"""
   token = load_or_refresh_token(inference_command_config.tokenfile, AUTH_TOKEN_URL, AUTH_CLIENT_ID)
   if not token is None:
     inferences = get_inference(token, id=id, factbase_id=factbase_id, knowledgebase_id=knowledgebase_id, status=status,
                                sort_by=sort, raw_modifier=raw_modifier)
     resources = [dict_from_resource(res, DEFAULT_COLUMNS) for res in inferences]
     if format == 'csv':
-      click.echo(csv_from_dictlist(resources))
-    else:
+      click.echo(csv_from_dictlist(resources, with_headers=True))
+    elif format == 'csv_no_hdr':
+      click.echo(csv_from_dictlist(resources, with_headers=False))
+    elif format == 'json':
       click.echo(resources)
+    else:
+      raise
+
   else:
     click.echo("Token was none")
 

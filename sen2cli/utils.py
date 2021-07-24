@@ -43,11 +43,12 @@ def dict_from_resource(res: ResourceObject, columns: List[str]) -> dict:
   return {**id, **ret}
 
 
-def csv_from_dictlist(list: List[dict]) -> str:
+def csv_from_dictlist(list: List[dict], with_headers: bool = True) -> str:
   if not list is None and len(list) > 0:
     with io.StringIO() as csv_string:
       csv_writer = DictWriter(csv_string, fieldnames=list[0].keys(), delimiter=DEFAULT_DELIMITER)
-      csv_writer.writeheader()
+      if with_headers:
+        csv_writer.writeheader()
       csv_writer.writerows(list)
       return csv_string.getvalue()
 
