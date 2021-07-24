@@ -16,9 +16,12 @@ Please have a look at the [GitHub guides](https://guides.github.com/) before con
     made a certain change, you might have forgotten it in a few weeks.
   - **Do** use [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) style for your commit messages. 
   - **Do** stick to the templates when writing an issue or pull request whenever possible.
+  - **Do** use [Google style pydoc](https://sphinxcontrib-napoleon.readthedocs.io/en/latest/example_google.html) strings for documentation.
   - **Don't** merge your own pull requets! Let someone else check your work before it goes into `main`. 
 
 ## Pull requests
   - **Do** address a single concern in the least number of changed lines / files as possible.
   - **Do** make sure your PR can be auto-merged into `main`.
-  -
+  - **Do** use squash commits on merging.
+  - **Do** use [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) style for your PR comments. 
+ 

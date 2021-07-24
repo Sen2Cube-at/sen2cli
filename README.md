@@ -14,6 +14,9 @@ pip install git+https://github.com/ZGIS/sen2cli.git@main
 
 Run in a Docker container
 ```
+## Download Dockerfile from GitHub
+wget https://raw.githubusercontent.com/ZGIS/sen2cli/main/Dockerfile
+
 docker build -t sen2cli:latest .
 docker run -it --name sen2cli \
   -v "$(pwd)"/host_data:/home/sen2cli/host_data \
@@ -49,9 +52,9 @@ sen2cli inference abort --id=7769 --id=7770 --id=7771 --id=7772
 sen2cli inference create 221 1 2020-03-01 2020-08-01 ./aoi.geojson --description="Very descriptive"
 ```
 
-## Advanced usage (on Unix)
+## Advanced usage
 
-Create inference for specific files in a folder
+Create inference for specific files in a folder (on Unix):
 ```
 find ./data -name "id_503*.geojson" -exec sen2cli inference create 221 1 2020-03-01 2020-08-01 {} --description="{}" \;
 ```
