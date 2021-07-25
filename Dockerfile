@@ -1,5 +1,5 @@
 FROM python:3.8-slim
-ARG SEN2CLI_VERSION="v0.1.0"
+ARG SEN2CLI_VERSION="v0.2.0"
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
 		git \
