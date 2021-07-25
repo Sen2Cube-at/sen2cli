@@ -88,31 +88,33 @@ def ls(inference_command_config: InferenceCommandConfig,
     click.echo("Token was none")
 
 
-@inference.command()
+@inference.command(help="Rerun finished / stopped / failed inferences")
 @click.option('--id', help="Which inference to rerun.", type=click.INT, multiple=True)
+@click.option('--dry-run', help="Will only display the inferences affected by rerun but not schedule them.", type=click.BOOL, default=False, is_flag=True)
 @inference_command_config
-def rerun(inference_command_config, id):
+def rerun(inference_command_config: InferenceCommandConfig, id: int, dry_run: bool):
   if len(id) == 0:
     click.echo("At least one --id needs to be given.")
   else:
     token = load_or_refresh_token(inference_command_config.tokenfile, AUTH_TOKEN_URL, AUTH_CLIENT_ID)
     if not token is None:
-      updated = update_inference(token, id, 'CREATED')
+      updated = update_inference(token, id, 'CREATED', dry_run=dry_run)
       _click_echo_output(inference_command_config.output_format, updated)
     else:
       click.echo("Token was none")
 
 
-@inference.command()
-@click.option('--id', help="Which inference to rerun.", type=click.INT, multiple=True)
+@inference.command(help="Abort running / scheduled inferences")
+@click.option('--id', help="Which inference to abort.", type=click.INT, multiple=True)
+@click.option('--dry-run', help="Will only display the inferences affected by abort but not abort them.", type=click.BOOL, default=False, is_flag=True)
 @inference_command_config
-def abort(inference_command_config, id):
+def abort(inference_command_config: InferenceCommandConfig, id: int, dry_run: bool):
   if len(id) == 0:
     click.echo("At least one --id needs to be given.")
   else:
     token = load_or_refresh_token(inference_command_config.tokenfile, AUTH_TOKEN_URL, AUTH_CLIENT_ID)
     if not token is None:
-      updated = update_inference(token, id, 'ABORTED')
+      updated = update_inference(token, id, 'ABORTED', dry_run=dry_run)
       _click_echo_output(inference_command_config.output_format, updated)
     else:
       click.echo("Token was none")

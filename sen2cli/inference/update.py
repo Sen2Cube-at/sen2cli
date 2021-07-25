@@ -15,6 +15,7 @@ logger = logging.getLogger(__name__)
 def update_inference(token: OAuth2Token,
                      id: Union[int, List, tuple, None] = None,
                      new_status: str = None,
+                     dry_run: bool = False
                      ) -> List[dict]:
   with Session(API_BASE_URL,
                request_kwargs=dict(
@@ -28,7 +29,10 @@ def update_inference(token: OAuth2Token,
       for inference in inferences.resources:
         if inference.status in ALLOWED_BEFORE_STATUS[new_status]:
           inference.status = new_status
-          inference.commit()
+          if not dry_run:
+            inference.commit()
+          else:
+            logger.info("Dry run. Skipping commit.")
           updated_inferences.append(inference)
         else:
           logger.warning(
