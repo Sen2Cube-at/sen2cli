@@ -127,9 +127,10 @@ def abort(inference_command_config: InferenceCommandConfig, id: int, dry_run: bo
 @click.argument('temporal_subset_end', type=click.DateTime(formats=['%Y-%m-%d']))
 @click.argument('spatial_subset', type=click.File('r'))
 @click.option('--description', help="Description of the inference", type=click.STRING)
+@click.option('--dry-run', help="Will only display the inference but not create it.", type=click.BOOL, default=False, is_flag=True)
 @inference_command_config
 def create(inference_command_config, knowledgebase_id, factbase_id, temporal_subset_start, temporal_subset_end,
-           spatial_subset: TextIOWrapper, description):
+           spatial_subset: TextIOWrapper, description, dry_run: bool):
   token = load_or_refresh_token(inference_command_config.tokenfile, AUTH_TOKEN_URL, AUTH_CLIENT_ID)
   if not token is None:
     geojson = spatial_subset.read().replace("\n", " ")
@@ -139,7 +140,8 @@ def create(inference_command_config, knowledgebase_id, factbase_id, temporal_sub
                                temp_range_start=temporal_subset_start,
                                temp_range_end=temporal_subset_end,
                                spatial_subset=geojson,
-                               description=description)
+                               description=description,
+                               dry_run=dry_run)
     _click_echo_output(inference_command_config.output_format, [created])
   else:
     click.echo("Token was none")
