@@ -5,6 +5,7 @@ import os.path
 
 import click
 
+from  .__version__ import __version__
 from .env import CONFIG_PATH
 from .inference import cli as inference_cli
 from .session import cli as session_cli
@@ -29,6 +30,9 @@ def cli(log_file, verbose: int):
   if not os.path.isdir(CONFIG_PATH):
     os.mkdir(CONFIG_PATH)
 
+@cli.command(help="Prints program version")
+def version():
+  click.echo(f"{__version__}")
 
 cli.add_command(session_cli.session)
 cli.add_command(inference_cli.inference)

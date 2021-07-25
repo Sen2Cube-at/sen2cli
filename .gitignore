@@ -75,4 +75,5 @@ fabric.properties
 *.egg-info/
 .eggs
 
-/host_data/
+host_data/
+dist/

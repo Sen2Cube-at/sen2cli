@@ -11,8 +11,10 @@ INFERENCE_STATUS = ['ABORTED',
 
 ALLOWED_BEFORE_STATUS = {
   'CREATED': ['ABORTED', 'FAILED', 'SUCCEEDED'],
-  'ABORTED': ['CREATED', 'SCHEDULED', 'STARTED']
+  'ABORTED': ['CREATED', 'SCHEDULED', 'STARTED'],
+  'DELETE':  ['ABORTED', 'FAILED', 'SUCCEEDED'],   ## There is no DELETE status in inference, but to keep the code consistent we do it that way :-)
 }
+
 
 DEFAULT_COLUMNS: Final[List[str]] = [
   'factbase_id',

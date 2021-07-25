@@ -20,8 +20,19 @@ Please have a look at the [GitHub guides](https://guides.github.com/) before con
   - **Don't** merge your own pull requets! Let someone else check your work before it goes into `main`. 
 
 ## Pull requests
-  - **Do** address a single concern in the least number of changed lines / files as possible.
-  - **Do** make sure your PR can be auto-merged into `main`.
-  - **Do** use squash commits on merging.
+  - **Do** address a single concern in the least number of changes as possible.
+  - **Do** make sure your PR can be auto-merged into the branch you want to merge against e.g. `main`.
+  - **Do** use squash commits on merging feature branches to `main` / `develop` to keep their history clean. Rule of
+    thumb: Every merge should result in one [conventional commit](https://www.conventionalcommits.org/en/v1.0.0/) for the CHANGELOG. 
   - **Do** use [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) style for your PR comments. 
  
+## Releasing new version
+
+  1. Merge all changes to `develop` branch.
+  1. TEST EVERYTHING!   
+  1. Update all version numbers. (setup.py, Dockerfile).  Use [semantic versioning](https://semver.org/).
+  1. Create a version bump commit with comment `chore(release): <VERSION>`
+  1. Create version tag locally. Name it `v<version>`.
+  1. Run `auto-changelog -u -d "Commandline interface for Sen2Cube.at backend." --tag-prefix=v --github`
+  1. Amend `v<VERSION>` commit with generated `CHANGELOG.md`
+  1. Push everything and create GitHub release.

@@ -12,12 +12,11 @@ from ..utils import dict_from_resource, filter_string_from_parameter
 logger = logging.getLogger(__name__)
 
 
-def update_inference(token: OAuth2Token,
+def delete_inference(token: OAuth2Token,
                      id: Union[int, List, tuple, None] = None,
                      factbase_id: Union[int, List, tuple, None] = None,
                      knowledgebase_id: Union[int, List, tuple, None] = None,
                      status: Union[str, List, tuple, None] = None,
-                     new_status: str = None,
                      dry_run: bool = False
                      ) -> List[dict]:
   with Session(API_BASE_URL,
@@ -42,20 +41,20 @@ def update_inference(token: OAuth2Token,
       logger.debug(merged_filters.url_with_modifiers(''))
       inferences = session.get('inference', merged_filters)
       logger.info(f"Inferences loaded: {len(inferences.resources)}")
-      updated_inferences = []
+      deleted_inferences = []
       for inference in inferences.resources:
-        if inference.status in ALLOWED_BEFORE_STATUS[new_status]:
-          inference.status = new_status
+        if inference.status in ALLOWED_BEFORE_STATUS['DELETE']:
           if not dry_run:
+            inference.delete()
             inference.commit()
           else:
             logger.info("Dry run. Skipping commit.")
-          updated_inferences.append(inference)
+          deleted_inferences.append(inference)
         else:
           logger.warning(
-              f"Could not set new status for inference {inference.id}: {inference.status} -> {new_status} is not allowed.")
+              f"Could not delete inference {inference.id}: {inference.status} -> DELETE is not allowed.")
 
-      return [dict_from_resource(res, DEFAULT_COLUMNS) for res in updated_inferences]
+      return [dict_from_resource(res, DEFAULT_COLUMNS) for res in deleted_inferences]
     except DocumentError as e:
       logger.error(f"Could not update inference. Reason: {e}", exc_info=True)
     except Exception as e:

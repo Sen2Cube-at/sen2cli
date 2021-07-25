@@ -14,7 +14,7 @@ URL = 'https://github.com/ZGIS/sen2cli'
 EMAIL = 'me@example.com'
 AUTHOR = 'Sen2Cube.at'
 REQUIRES_PYTHON = '>=3.8.0'
-VERSION = '0.1.0'
+VERSION = None #will be filled from __version__.py '0.1.0'
 
 REQUIRED = [
   'Click~=8.0.1',
@@ -43,9 +43,20 @@ try:
 except FileNotFoundError:
     long_description = DESCRIPTION
 
+# Load the package's __version__.py module as a dictionary.
+about = {}
+if not VERSION:
+    project_slug = NAME.lower().replace("-", "_").replace(" ", "_")
+    with open(os.path.join(here, project_slug, '__version__.py')) as f:
+        exec(f.read(), about)
+else:
+    about['__version__'] = VERSION
+
+
+
 setup(
     name=NAME,
-    version=VERSION,
+    version=about['__version__'],
     description=DESCRIPTION,
     long_description=long_description,
     long_description_content_type='text/markdown',
