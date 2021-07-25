@@ -3,7 +3,7 @@ import os
 from typing import Final
 
 HOME_PATH: Final[str] = os.path.expanduser("~")
-CONFIG_PATH: Final[str] = os.environ.get('IQ_CLI_CONFIG_PATH', f"{HOME_PATH}/.iq-cli")
+CONFIG_PATH: Final[str] = os.environ.get('IQ_CLI_CONFIG_PATH', f"{HOME_PATH}/.sen2cli")
 CONFIG_PATH_TOKENFILE: Final[str] = os.environ.get('IQ_CLI_CONFIG_PATH_TOKENFILE', f"{CONFIG_PATH}/token.json")
 
 LOGGER_CONFIG_FILE: Final[str] = f"{CONFIG_PATH}/logger.ini"
