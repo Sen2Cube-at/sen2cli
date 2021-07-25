@@ -1,4 +1,5 @@
 FROM python:3.8-slim
+ARG SEN2CLI_VERSION="v0.1.0"
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
 		git \
@@ -14,6 +15,6 @@ RUN cd /home/sen2cli  \
     && . /home/sen2cli/.venv/sen2cli/bin/activate \
     && echo "source /home/sen2cli/.venv/sen2cli/bin/activate" >> /home/sen2cli/.bashrc \
     && pip install wheel \
-    && pip install git+https://github.com/ZGIS/sen2cli.git@main
+    && pip install "git+https://github.com/ZGIS/sen2cli.git@${SEN2CLI_VERSION}"
 
 CMD . /home/sen2cli/.venv/sen2cli/bin/activate && exec python
