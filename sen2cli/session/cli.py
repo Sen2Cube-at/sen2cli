@@ -20,7 +20,7 @@ session_command_config = click \
   .make_pass_decorator(SessionCommandConfig, ensure=True)
 
 
-@click.group()
+@click.group(help="Session related commands like 'login'")
 @click.option('--tokenfile', help="File that stores the token.",
               envvar="S2C_TOKENFILE",
               show_envvar=True,
@@ -31,7 +31,7 @@ def session(session_command_config, tokenfile):
   session_command_config.tokenfile = tokenfile
 
 
-@session.command()
+@session.command(help="Login with username and password")
 @click.option('--username', help="Login with this username", envvar="S2C_USERNAME", prompt=True, show_envvar=True)
 @click.option('--password', help="Login with this password", envvar="S2C_PASSWORD", prompt=True, hide_input=True,
               show_envvar=True)
@@ -45,7 +45,7 @@ def login(session_command_config, username, password):
     save_token(session_command_config.tokenfile, token)
 
 
-@session.command()
+@session.command(help="Use saved refresh token to refresh session")
 @session_command_config
 def refresh(session_command_config):
   token = load_token(session_command_config.tokenfile)
@@ -58,7 +58,7 @@ def refresh(session_command_config):
       click.echo(f"Refresh successful. Session expires at {expires_at}")
       save_token(session_command_config.tokenfile, token)
 
-@session.command()
+@session.command(help="Show info for current session")
 @session_command_config
 def info(session_command_config):
   token = load_token(session_command_config.tokenfile)
@@ -67,9 +67,15 @@ def info(session_command_config):
     click.echo("Could not load session token.")
   else:
     expires_at = datetime.fromtimestamp(token['expires_at'])
+    refresh_until = datetime.fromtimestamp(token['expires_at'] - token['expires_in'] + token['refresh_expires_in'])
     if datetime.now() > expires_at:
-      click.echo("Token expired.")
+      if (datetime.now() > refresh_until):
+        click.echo("Session expired.")
+      else:
+        click.echo(f"Token expired on: {expires_at}")
+        click.echo(f"Refresh until:    {refresh_until}")
     else:
       user_info = get_user_info(token)
-      click.echo(f"You're logged in as: {user_info['preferred_username']}")
-      click.echo(f"Token expires at: {expires_at}")
+      click.echo(f"Logged in as:  {user_info['preferred_username']}")
+      click.echo(f"Expires at:    {expires_at}")
+      click.echo(f"Refresh until: {refresh_until}")

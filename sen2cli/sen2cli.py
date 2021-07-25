@@ -30,7 +30,7 @@ def cli(log_file, verbose: int):
   if not os.path.isdir(CONFIG_PATH):
     os.mkdir(CONFIG_PATH)
 
-@cli.command()
+@cli.command(help="Prints program version")
 def version():
   click.echo(f"{__version__}")
 
