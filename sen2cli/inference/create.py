@@ -5,7 +5,8 @@ from jsonapi_client import Session
 from jsonapi_client.exceptions import DocumentError
 from oauthlib.oauth2 import OAuth2Token
 
-from .util import INFERENCE_SCHEMA
+from utils import dict_from_resource
+from .util import DEFAULT_COLUMNS, INFERENCE_SCHEMA
 from ..env import API_BASE_URL
 from ..session.oauth_util import get_user_info
 
@@ -19,7 +20,7 @@ def create_inference(token: OAuth2Token,
                      temp_range_end: datetime,
                      spatial_subset: str,
                      description: str,
-                     ) -> int:
+                     ) -> dict:
 
   user_info = get_user_info(token)
 
@@ -52,7 +53,7 @@ def create_inference(token: OAuth2Token,
       inference.factbase = factbase_id
       logger.debug(inference.json)
       inference.commit()
-      return inference.id
+      return dict_from_resource(inference, DEFAULT_COLUMNS)
     except DocumentError as e:
       logger.error(f"Could not create inference. Reason: {e}", exc_info=True)
     except Exception as e:
