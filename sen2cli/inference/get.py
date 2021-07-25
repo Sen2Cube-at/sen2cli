@@ -1,7 +1,7 @@
 import logging
 from typing import List, Union
 
-from jsonapi_client import Session
+from jsonapi_client import Filter, Session
 from jsonapi_client.exceptions import DocumentError
 from jsonapi_client.filter import Filter, Modifier
 from jsonapi_client.resourceobject import ResourceObject
@@ -35,21 +35,25 @@ def get_inference(token: OAuth2Token,
                request_kwargs=dict(
                    headers={'Authorization': f"{token['token_type']} {token['access_token']}"})) as session:
     try:
-      filter_list = ','.join(list(filter(None, [
+      filter_str_list = ','.join(list(filter(None, [
         filter_string_from_parameter('id', id),
         filter_string_from_parameter('factbase_id', factbase_id),
         filter_string_from_parameter('knowledgebase_id', knowledgebase_id),
         filter_string_from_parameter('status', status)
       ])))
 
-      merged_filters = Filter(f'filter=[{filter_list}]')
+      modifier_list: List[Modifier] = []
 
-      if not sort_by is None:
-        merged_filters += Modifier(f'sort={sort_by}')
+      if len(filter_str_list) > 0:
+        modifier_list.append(Filter(query_str=f'filter=[{filter_str_list}]'))
 
-      if not raw_modifier is None:
-        merged_filters += Modifier(raw_modifier)
+      if sort_by is not None:
+        modifier_list.append(Modifier(f'sort={sort_by}'))
 
+      if raw_modifier is not None:
+        modifier_list.append(Modifier(raw_modifier))
+
+      merged_filters = sum(modifier_list, Modifier())
       logger.debug(merged_filters.url_with_modifiers(''))
       inferences = session.get('inference', merged_filters)
       logger.info(f"Inferences loaded: {len(inferences.resources)}")

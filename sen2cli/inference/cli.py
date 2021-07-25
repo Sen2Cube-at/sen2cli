@@ -38,7 +38,7 @@ inference_command_config = click \
   .make_pass_decorator(InferenceCommandConfig, ensure=True)
 
 
-@click.group(help="Start/Stop/List/Delete etc inferences.")
+@click.group(help="Display / create / modify inferences")
 @click.option('--tokenfile', help="File that stores the token.",
               envvar="S2C_TOKENFILE",
               show_envvar=True,
@@ -55,7 +55,7 @@ def inference(inference_command_config: InferenceCommandConfig,
   pass
 
 
-@inference.command(help="List inferences.")
+@inference.command(help="List inferences")
 @click.option('--id', help="Filter for inference ID",
               type=click.INT, multiple=True)
 @click.option('--factbase_id', help="Filter for factbase ID",
@@ -85,42 +85,64 @@ def ls(inference_command_config: InferenceCommandConfig,
     resources = [dict_from_resource(res, DEFAULT_COLUMNS) for res in inferences]
     _click_echo_output(inference_command_config.output_format, resources)
   else:
-    click.echo("Token was none")
+    click.echo("No active Session or invalid token.")
 
 
 @inference.command(help="Rerun finished / stopped / failed inferences")
 @click.option('--id', help="Which inference to rerun.", type=click.INT, multiple=True)
+@click.option('--factbase_id', help="Filter for factbase ID",
+              type=click.INT, multiple=True)
+@click.option('--knowledgebase_id', help="Filter for model ID",
+              type=click.INT, multiple=True)
+@click.option('--status', help="Filter for status",
+              type=click.Choice(INFERENCE_STATUS), multiple=True)
 @click.option('--dry-run', help="Will only display the inferences affected by rerun but not schedule them.", type=click.BOOL, default=False, is_flag=True)
 @inference_command_config
-def rerun(inference_command_config: InferenceCommandConfig, id: int, dry_run: bool):
-  if len(id) == 0:
-    click.echo("At least one --id needs to be given.")
+def rerun(inference_command_config: InferenceCommandConfig,
+          id: int,
+          factbase_id: int,
+          knowledgebase_id: int,
+          status: str,
+          dry_run: bool):
+  if len(id) == 0 and len(factbase_id) == 0 and len(knowledgebase_id) == 0 and len(status) == 0:
+    click.echo("At least one filter needs to be specified.")
   else:
     token = load_or_refresh_token(inference_command_config.tokenfile, AUTH_TOKEN_URL, AUTH_CLIENT_ID)
     if not token is None:
-      updated = update_inference(token, id, 'CREATED', dry_run=dry_run)
+      updated = update_inference(token, id, factbase_id, knowledgebase_id, status, 'CREATED', dry_run=dry_run)
       _click_echo_output(inference_command_config.output_format, updated)
     else:
-      click.echo("Token was none")
+      click.echo("No active Session or invalid token.")
 
 
 @inference.command(help="Abort running / scheduled inferences")
 @click.option('--id', help="Which inference to abort.", type=click.INT, multiple=True)
+@click.option('--factbase_id', help="Filter for factbase ID",
+              type=click.INT, multiple=True)
+@click.option('--knowledgebase_id', help="Filter for model ID",
+              type=click.INT, multiple=True)
+@click.option('--status', help="Filter for status",
+              type=click.Choice(INFERENCE_STATUS), multiple=True)
 @click.option('--dry-run', help="Will only display the inferences affected by abort but not abort them.", type=click.BOOL, default=False, is_flag=True)
 @inference_command_config
-def abort(inference_command_config: InferenceCommandConfig, id: int, dry_run: bool):
-  if len(id) == 0:
-    click.echo("At least one --id needs to be given.")
+def abort(inference_command_config: InferenceCommandConfig,
+          id: int,
+          factbase_id: int,
+          knowledgebase_id: int,
+          status: str,
+          dry_run: bool):
+  if len(id) == 0 and len(factbase_id) == 0 and len(knowledgebase_id) == 0 and len(status) == 0:
+    click.echo("At least one filter needs to be specified.")
   else:
     token = load_or_refresh_token(inference_command_config.tokenfile, AUTH_TOKEN_URL, AUTH_CLIENT_ID)
     if not token is None:
-      updated = update_inference(token, id, 'ABORTED', dry_run=dry_run)
+      updated = update_inference(token, id, factbase_id, knowledgebase_id, status, 'ABORTED', dry_run=dry_run)
       _click_echo_output(inference_command_config.output_format, updated)
     else:
-      click.echo("Token was none")
+      click.echo("No active Session or invalid token.")
 
 
-@inference.command()
+@inference.command(help="Create and schedule inference")
 @click.argument('knowledgebase_id', type=click.INT)
 @click.argument('factbase_id', type=click.INT)
 @click.argument('temporal_subset_start', type=click.DateTime(formats=['%Y-%m-%d']))
@@ -144,4 +166,4 @@ def create(inference_command_config, knowledgebase_id, factbase_id, temporal_sub
                                dry_run=dry_run)
     _click_echo_output(inference_command_config.output_format, [created])
   else:
-    click.echo("Token was none")
+    click.echo("No active Session or invalid token.")
