@@ -6,6 +6,7 @@ from typing import List
 import click
 
 from .create import create_inference
+from .delete import delete_inference
 from .get import get_inference
 from .update import update_inference
 from .util import DEFAULT_COLUMNS, INFERENCE_STATUS
@@ -138,6 +139,32 @@ def abort(inference_command_config: InferenceCommandConfig,
     if not token is None:
       updated = update_inference(token, id, factbase_id, knowledgebase_id, status, 'ABORTED', dry_run=dry_run)
       _click_echo_output(inference_command_config.output_format, updated)
+    else:
+      click.echo("No active Session or invalid token.")
+
+@inference.command(help="Delete inferences.")
+@click.option('--id', help="Which inference to abort.", type=click.INT, multiple=True)
+@click.option('--factbase_id', help="Filter for factbase ID",
+              type=click.INT, multiple=True)
+@click.option('--knowledgebase_id', help="Filter for model ID",
+              type=click.INT, multiple=True)
+@click.option('--status', help="Filter for status",
+              type=click.Choice(INFERENCE_STATUS), multiple=True)
+@click.option('--dry-run', help="Will only display the inferences affected by delete but not delete them.", type=click.BOOL, default=False, is_flag=True)
+@inference_command_config
+def delete(inference_command_config: InferenceCommandConfig,
+          id: int,
+          factbase_id: int,
+          knowledgebase_id: int,
+          status: str,
+          dry_run: bool):
+  if len(id) == 0 and len(factbase_id) == 0 and len(knowledgebase_id) == 0 and len(status) == 0:
+    click.echo("At least one filter needs to be specified.")
+  else:
+    token = load_or_refresh_token(inference_command_config.tokenfile, AUTH_TOKEN_URL, AUTH_CLIENT_ID)
+    if not token is None:
+      deleted = delete_inference(token, id, factbase_id, knowledgebase_id, status, dry_run=dry_run)
+      _click_echo_output(inference_command_config.output_format, deleted)
     else:
       click.echo("No active Session or invalid token.")
 
