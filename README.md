@@ -102,7 +102,7 @@ Login successful. Session expires at 1970-01-01 00:05:00.000000
 ```
 
 ```
-(sen2cli) MBP:sen2cli steffen$ sen2cli session info
+$ sen2cli session info
 Logged in as:  steffen.reichel
 Expires at:    1970-01-01 00:05:00.000000
 Refresh until: 1970-01-01 00:30:00.000000
@@ -128,7 +128,7 @@ Refresh until: 1970-01-01 00:40:00.000000
 
 ### Working with inferences
 
-The output of the `inference` defaults to CSV. All log messages are written to `STD_ERR`.
+The output format of the `inference` defaults to CSV. All log messages are written to `STD_ERR` (details see below)
 
 Schedule an inference
 ```
@@ -260,7 +260,8 @@ Create inference for specific files in a folder (on Unix):
 find ./host_data/geodata -name "id_9*01.geojson" -exec sen2cli inference create 218 1 2020-03-01 2020-08-01 {} --description="{}" \;
 ```
 
-###Advanced filtering
+### Advanced filtering
+
 For more advanced filters `ls` has a `--raw_modifier` option. The content of this option will be added as URL parameter
 to the query. For example if you want to filter for specific error messages, you can create a file `filter.json` with
 the following contents
@@ -292,6 +293,79 @@ For full documentation on the filter language see [flask-rest-jsonapi filterring
 **NOTE** this might have unforseen consquences and side-effects when using in combination with other filters. As this
 parameter is just added as a URL parameter, it can be used for other shenanigans like pagination, or sparse result sets.
 For that reason it's only available in `ls` and not the rest. USE AT YOUR OWN RISK! ;-)
+
+### Working with verbose logs / log files
+
+All log output is written to `STD_ERR` per default and only errors are logged. There is
+a `-v` option that can be used to switch on more verbose logging.
+
+- `-v` logs errors, and warnings
+- `-vv` logs errors, warnings, and info
+- `-vvv` logs errors, warnings, info, and debug
+
+```
+$ sen2cli -vv inference ls --id 8345
+2021-07-26 12:17:00 [INFO] - load_or_refresh_token:108 - Token expired. Trying refresh.
+2021-07-26 12:17:00 [INFO] - refresh_token:60 - Token refresh successful.
+2021-07-26 12:17:00 [INFO] - __enter__:261 - Entering session
+2021-07-26 12:17:00 [INFO] - _fetch_json:487 - Fetching document from url ParseResult(scheme='https', netloc='api.sen2cube.at', path='/v1/inference', params='', query='&filter=[{"name":"id", "op": "in", "val": [8345]}]&sort=-id', fragment='')
+2021-07-26 12:17:00 [INFO] - get_inference:59 - Inferences loaded: 1
+2021-07-26 12:17:00 [INFO] - __exit__:271 - Exiting session
+2021-07-26 12:17:00 [INFO] - _commit_sync:601 - Committing dirty resources
+id;factbase_id;favourite;knowledgebase_id;owner;qgis_project_location;output;status;status_message;status_progress;status_timestamp;temp_range_end;temp_range_start;timestamp_created;timestamp_finished;timestamp_started
+8345;1;False;218;steffen.reichel;/output/sen2cube/steffen.reichel/qgis-project-id8345.zip;"[{""name"": ""Cloud_free_composite"", ""inference_id"": 8345, ""value_type"": ""numerical"", ""value_range"": [467.0, 4031.0], ""dims"": [""band"", ""y"", ""x""], ""file_type"": ""geotiff"", ""vis_type"": ""composite"", ""data"": ""/output/sen2cube/steffen.reichel/Cloud_free_composite_id8345_4326.tiff"", ""bytes"": 2056211, ""band_value_ranges"": [[467.0, 4031.0], [696.0, 3521.0], [911.5, 3440.0]]}]";SUCCEEDED;The inference was successfully processed;;;2020-08-01T23:59:59.999000+00:00;2020-03-01T00:00:00+00:00;2021-07-25T21:11:22.927903+00:00;2021-07-25T21:18:26.814518+00:00;2021-07-25T21:15:36.628143+00:00
+```
+
+```
+$ sen2cli -vvv inference ls --id 8345
+2021-07-26 12:17:47 [DEBUG] - load_token:83 - Loading token from /Users/steffen/.sen2cli/token.json...
+2021-07-26 12:17:47 [INFO] - __enter__:261 - Entering session
+2021-07-26 12:17:47 [DEBUG] - filter_string_from_parameter:66 - {"name":"id", "op": "in", "val": [8345]}
+2021-07-26 12:17:47 [DEBUG] - filter_string_from_parameter:69 - List/Tuple was empty
+2021-07-26 12:17:47 [DEBUG] - filter_string_from_parameter:69 - List/Tuple was empty
+2021-07-26 12:17:47 [DEBUG] - filter_string_from_parameter:69 - List/Tuple was empty
+2021-07-26 12:17:47 [DEBUG] - get_inference:57 - ?&filter=[{"name":"id", "op": "in", "val": [8345]}]&sort=-id
+2021-07-26 12:17:47 [INFO] - _fetch_json:487 - Fetching document from url ParseResult(scheme='https', netloc='api.sen2cube.at', path='/v1/inference', params='', query='&filter=[{"name":"id", "op": "in", "val": [8345]}]&sort=-id', fragment='')
+2021-07-26 12:17:47 [DEBUG] - _new_conn:971 - Starting new HTTPS connection (1): api.sen2cube.at:443
+2021-07-26 12:17:47 [DEBUG] - _make_request:452 - https://api.sen2cube.at:443 "GET /v1/inference?&filter=%5B%7B%22name%22:%22id%22,%20%22op%22:%20%22in%22,%20%22val%22:%20%5B8345%5D%7D%5D&sort=-id HTTP/1.1" 200 188645
+2021-07-26 12:17:48 [INFO] - get_inference:59 - Inferences loaded: 1
+2021-07-26 12:17:48 [INFO] - __exit__:271 - Exiting session
+2021-07-26 12:17:48 [INFO] - _commit_sync:601 - Committing dirty resources
+id;factbase_id;favourite;knowledgebase_id;owner;qgis_project_location;output;status;status_message;status_progress;status_timestamp;temp_range_end;temp_range_start;timestamp_created;timestamp_finished;timestamp_started
+8345;1;False;218;steffen.reichel;/output/sen2cube/steffen.reichel/qgis-project-id8345.zip;"[{""name"": ""Cloud_free_composite"", ""inference_id"": 8345, ""value_type"": ""numerical"", ""value_range"": [467.0, 4031.0], ""dims"": [""band"", ""y"", ""x""], ""file_type"": ""geotiff"", ""vis_type"": ""composite"", ""data"": ""/output/sen2cube/steffen.reichel/Cloud_free_composite_id8345_4326.tiff"", ""bytes"": 2056211, ""band_value_ranges"": [[467.0, 4031.0], [696.0, 3521.0], [911.5, 3440.0]]}]";SUCCEEDED;The inference was successfully processed;;;2020-08-01T23:59:59.999000+00:00;2020-03-01T00:00:00+00:00;2021-07-25T21:11:22.927903+00:00;2021-07-25T21:18:26.814518+00:00;2021-07-25T21:15:36.628143+00:00
+```
+
+As all normal output is written to `STD_OUT` it can be easily separated from the logging with output redirection.
+
+```
+$ sen2cli -vvv inference ls --id 8345 1> inferences.csv 2> logfile.txt
+$ cat inferences.csv 
+id;factbase_id;favourite;knowledgebase_id;owner;qgis_project_location;output;status;status_message;status_progress;status_timestamp;temp_range_end;temp_range_start;timestamp_created;timestamp_finished;timestamp_started
+8345;1;False;218;steffen.reichel;/output/sen2cube/steffen.reichel/qgis-project-id8345.zip;"[{""name"": ""Cloud_free_composite"", ""inference_id"": 8345, ""value_type"": ""numerical"", ""value_range"": [467.0, 4031.0], ""dims"": [""band"", ""y"", ""x""], ""file_type"": ""geotiff"", ""vis_type"": ""composite"", ""data"": ""/output/sen2cube/steffen.reichel/Cloud_free_composite_id8345_4326.tiff"", ""bytes"": 2056211, ""band_value_ranges"": [[467.0, 4031.0], [696.0, 3521.0], [911.5, 3440.0]]}]";SUCCEEDED;The inference was successfully processed;;;2020-08-01T23:59:59.999000+00:00;2020-03-01T00:00:00+00:00;2021-07-25T21:11:22.927903+00:00;2021-07-25T21:18:26.814518+00:00;2021-07-25T21:15:36.628143+00:00
+
+$ cat logfile.txt 
+2021-07-26 12:21:51 [DEBUG] - load_token:83 - Loading token from ~/.sen2cli/token.json...
+2021-07-26 12:21:51 [INFO] - __enter__:261 - Entering session
+2021-07-26 12:21:51 [DEBUG] - filter_string_from_parameter:66 - {"name":"id", "op": "in", "val": [8345]}
+2021-07-26 12:21:51 [DEBUG] - filter_string_from_parameter:69 - List/Tuple was empty
+2021-07-26 12:21:51 [DEBUG] - filter_string_from_parameter:69 - List/Tuple was empty
+2021-07-26 12:21:51 [DEBUG] - filter_string_from_parameter:69 - List/Tuple was empty
+2021-07-26 12:21:51 [DEBUG] - get_inference:57 - ?&filter=[{"name":"id", "op": "in", "val": [8345]}]&sort=-id
+2021-07-26 12:21:51 [INFO] - _fetch_json:487 - Fetching document from url ParseResult(scheme='https', netloc='api.sen2cube.at', path='/v1/inference', params='', query='&filter=[{"name":"id", "op": "in", "val": [8345]}]&sort=-id', fragment='')
+2021-07-26 12:21:51 [DEBUG] - _new_conn:971 - Starting new HTTPS connection (1): api.sen2cube.at:443
+2021-07-26 12:21:51 [DEBUG] - _make_request:452 - https://api.sen2cube.at:443 "GET /v1/inference?&filter=%5B%7B%22name%22:%22id%22,%20%22op%22:%20%22in%22,%20%22val%22:%20%5B8345%5D%7D%5D&sort=-id HTTP/1.1" 200 188645
+2021-07-26 12:21:51 [INFO] - get_inference:59 - Inferences loaded: 1
+2021-07-26 12:21:51 [INFO] - __exit__:271 - Exiting session
+2021-07-26 12:21:51 [INFO] - _commit_sync:601 - Committing dirty resources
+```
+
+If that is inconvenient the logfile can also be set via the `--log_file` option. If the logfile already exists, the new
+log will be appended to the current file.
+
+```
+$ sen2cli -vvv --log_file="./logfile.txt" inference ls --id 8345 > inferences.csv
+```
+
 
 #  License
 This program is free software: you can redistribute it and/or modify
