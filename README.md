@@ -260,6 +260,7 @@ find ./host_data/geodata -name "id_9*01.geojson" -exec sen2cli inference create 
 For more advanced filters `ls` has a `--raw_modifier` option. The content of this option will be added as URL parameter
 to the query. For example if you want to filter for specific error messages, you can create a file `filter.json` with
 the following contents
+
 ```json
 [
   {
@@ -283,9 +284,21 @@ id;factbase_id;favourite;knowledgebase_id;owner;qgis_project_location;output;sta
 8346;1;False;218;steffen.reichel;;[];FAILED;"The inference failed: Evaluation failed at 'data' because of ""OperationalError('(psycopg2.OperationalError) FATAL:  remaining connection slots are reserved for non-replication superuser connections\\n')""";;;2020-08-01T23:59:59.999000+00:00;2020-03-01T00:00:00+00:00;2021-07-25T21:11:25.077964+00:00;2021-07-25T21:16:40.303429+00:00;2021-07-25T21:15:28.514281+00:00
 ```
 
+Another example for filtering inferences by timestamp. 
+
+```json
+[
+  {
+    "name": "timestamp_started",
+    "op": "gt",
+    "val": "2021-07-25T22:06:22"
+  }
+]
+```
+
 For full documentation on the filter language see [flask-rest-jsonapi filterring](https://flask-rest-jsonapi.readthedocs.io/en/latest/filtering.html).
 
-**NOTE** this might have unforseen consquences and side-effects when using in combination with other filters. As this
+**NOTE** this might have unforeseen consequences and side effects when using in combination with other filters. As this
 parameter is just added as a URL parameter, it can be used for other shenanigans like pagination, or sparse result sets.
 For that reason it's only available in `ls` and not the rest. USE AT YOUR OWN RISK! ;-)
 
