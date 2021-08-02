@@ -17,4 +17,4 @@ RUN cd /home/sen2cli  \
     && pip install wheel \
     && pip install "git+https://github.com/ZGIS/sen2cli.git@${SEN2CLI_VERSION}"
 
-CMD . /home/sen2cli/.venv/sen2cli/bin/activate && exec python
+CMD . /home/sen2cli/.venv/sen2cli/bin/activate && /bin/bash

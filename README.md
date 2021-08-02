@@ -15,7 +15,7 @@ Install latest commit from `main` in your current Python environment run
 pip install git+https://github.com/ZGIS/sen2cli.git@main
 ```
 
-You can also specify a version instead of `@main` e.g. 
+You can also specify a version instead of `@main` e.g.
 ```bash
 pip install git+https://github.com/ZGIS/sen2cli.git@v0.2.0
 ```
@@ -26,7 +26,7 @@ Download [`Dockerfile`](https://github.com/ZGIS/sen2cli/blob/main/Dockerfile) fr
 latest release version run
 
 ```
-docker build -t sen2cli .
+docker build -t sen2cli --rm .
 ```
 
 You can specify a version / tag / commit ref via build args. E.g
@@ -39,12 +39,7 @@ To run the image and mount `./host_data` into `/home/sen2cli/host_data` run
 ```
 docker run -it --name sen2cli \
   -v "$(pwd)"/host_data:/home/sen2cli/host_data \
-  sen2cli /bin/bash
-```
-
-After you are done, you might want to remove the container.  
-```
-docker rm sen2cli
+  --rm sen2cli
 ```
 
 ## 🔰 Basic Usage
