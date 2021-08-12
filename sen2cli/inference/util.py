@@ -3,7 +3,7 @@ from typing import Final, List
 INFERENCE_STATUS = ['ABORTED',
                     'CREATED',
                     'FAILED',
-                    'OFFLINE',
+#SR only for factbases                    'OFFLINE',
                     'SCHEDULED',
                     'STARTED',
                     'SUCCEEDED'
