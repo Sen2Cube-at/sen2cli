@@ -68,9 +68,11 @@ def inference(inference_command_config: InferenceCommandConfig,
 @click.option('--sort', help="Columns to sort by. Example: owner,-knowledgebase_id",
               type=click.STRING, default="-id")
 @click.option('--page_size', help="Numbers of results to fetch per page. 0 to disable fetch all. --page_number will be ignored. (DEFAULT: 30)",
-              type=click.INT, default="30")
+              type=click.INT, default=30)
 @click.option('--page_number', help="Page to fetch. 0 for all pages (in badges of page_size). (DEFAULT: 1)",
-              type=click.INT, default="1")
+              type=click.INT, default=1)
+@click.option('--count_only', help="Only returns total number of inferences matching the query. (DEFAULT: False)",
+              type=click.BOOL, default=False, is_flag=True)
 @click.option('--raw_modifier',
               help="This will be added to the query string and can be used to build lmore sophisticated filters etc.",
               type=click.STRING)
@@ -83,17 +85,22 @@ def ls(inference_command_config: InferenceCommandConfig,
        sort: str,
        page_number: int,
        page_size: int,
+       count_only: bool,
        raw_modifier: str):
   """Lists inferences"""
   token = load_or_refresh_token(inference_command_config.tokenfile, AUTH_TOKEN_URL, AUTH_CLIENT_ID)
   if not token is None:
-    inferences = get_inference(token, id=id, factbase_id=factbase_id,knowledgebase_id=knowledgebase_id, status=status,
+    inferences = get_inference(token, id=id, factbase_id=factbase_id, knowledgebase_id=knowledgebase_id, status=status,
                                sort_by=sort, raw_modifier=raw_modifier,
                                page_size=page_size,
                                page_num=(page_number if page_number > 0 else 1),
-                               page_fetch_follows=(page_number <= 0))
-    resources = [dict_from_resource(res, DEFAULT_COLUMNS) for res in inferences]
-    _click_echo_output(inference_command_config.output_format, resources)
+                               page_fetch_follows=(page_number <= 0),
+                               result_count_only=count_only)
+    if not count_only:
+      resources = [dict_from_resource(res, DEFAULT_COLUMNS) for res in inferences]
+      _click_echo_output(inference_command_config.output_format, resources)
+    else:
+      _click_echo_output(inference_command_config.output_format, [{'inference_count': inferences}])
   else:
     click.echo("No active Session or invalid token.")
 

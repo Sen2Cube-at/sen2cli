@@ -22,8 +22,9 @@ def get_inference(token: OAuth2Token,
                   page_size: int = 30,
                   page_num: int = 1,
                   page_fetch_follows: bool = False,
+                  result_count_only: bool = False,
                   raw_modifier: str = None
-                  ) -> List[ResourceObject]:
+                  ) -> Union[List[ResourceObject], int]:
   """
   Get inferences
 
@@ -63,18 +64,23 @@ def get_inference(token: OAuth2Token,
       merged_filters = sum(modifier_list, Modifier())
       logger.debug(merged_filters.url_with_modifiers(''))
 
-      logger.info(f'Fetching inferendes... page size: {page_size}; page: {page_num}{"ff" if page_fetch_follows else ""}')
+      logger.info(f'Fetching inferences... page size: {page_size}; page: {page_num}{"+" if page_fetch_follows else ""}')
       inferences = session.get('inference', merged_filters)
       logger.info(f"Inferences matching query: {inferences.meta.count}")
-      logger.info(f"Inferences loaded: {len(inferences.resources)}")
 
-      res: List[ResourceObject] = inferences.resources
-      while page_fetch_follows and inferences.links.next:
-         inferences = inferences.links.next.fetch()
-         logger.info(f"Inferences loaded: {len(inferences.resources)}")
-         res.extend(inferences.resources)
-      logger.debug(res)
-      return res
+      if not result_count_only:
+        logger.info(f"Inferences loaded: {len(inferences.resources)}")
+        res: List[ResourceObject] = inferences.resources
+        while page_fetch_follows and inferences.links.next:
+           inferences = inferences.links.next.fetch()
+           logger.info(f"Inferences loaded: {len(inferences.resources)}")
+           res.extend(inferences.resources)
+        logger.debug(res)
+        return res
+      else:
+        logger.info("Only returning count.")
+        return inferences.meta.count
+
     except DocumentError as e:
       logger.error(f"Could not fetch inference. Reason: {e}", exc_info=True)
     except Exception as e:
