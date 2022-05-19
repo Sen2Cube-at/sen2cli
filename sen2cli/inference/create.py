@@ -5,7 +5,7 @@ from jsonapi_client import Session
 from jsonapi_client.exceptions import DocumentError
 from oauthlib.oauth2 import OAuth2Token
 
-from ..utils import dict_from_resource
+from ..utils import dict_from_resource, build_request_headers
 from .util import DEFAULT_COLUMNS, INFERENCE_SCHEMA
 from ..env import API_BASE_URL
 from ..session.oauth_util import get_user_info
@@ -27,7 +27,7 @@ def create_inference(token: OAuth2Token,
 
   with Session(API_BASE_URL, schema=INFERENCE_SCHEMA,
                request_kwargs=dict(
-                   headers={'Authorization': f"{token['token_type']} {token['access_token']}"})) as session:
+                   headers=build_request_headers(token))) as session:
     try:
       trs = temp_range_start.strftime("%Y-%m-%dT00:00:00.000Z")
       tre = temp_range_end.strftime("%Y-%m-%dT23:59:59.999Z")

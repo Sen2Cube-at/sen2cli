@@ -4,7 +4,7 @@
     <content url="file://$MODULE_DIR$">
       <sourceFolder url="file://$MODULE_DIR$/sen2cli" isTestSource="false" />
     </content>
-    <orderEntry type="jdk" jdkName="Python 3.8 (sen2cli)" jdkType="Python SDK" />
+    <orderEntry type="jdk" jdkName="Remote Python 3.8.11 Docker (sen2cli:latest)" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
   </component>
 </module>

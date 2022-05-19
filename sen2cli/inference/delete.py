@@ -7,7 +7,7 @@ from oauthlib.oauth2 import OAuth2Token
 
 from .util import ALLOWED_BEFORE_STATUS, DEFAULT_COLUMNS
 from ..env import API_BASE_URL
-from ..utils import dict_from_resource, filter_string_from_parameter
+from ..utils import dict_from_resource, filter_string_from_parameter, build_request_headers
 
 logger = logging.getLogger(__name__)
 
@@ -21,7 +21,7 @@ def delete_inference(token: OAuth2Token,
                      ) -> List[dict]:
   with Session(API_BASE_URL,
                request_kwargs=dict(
-                   headers={'Authorization': f"{token['token_type']} {token['access_token']}"})) as session:
+                   headers=build_request_headers(token))) as session:
     try:
       filter_str_list = ','.join(list(filter(None, [
         filter_string_from_parameter('id', id),

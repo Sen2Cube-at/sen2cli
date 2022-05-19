@@ -1,14 +1,14 @@
 import logging
 from typing import List, Union
 
-from jsonapi_client import Filter, Session
+from jsonapi_client import Session
 from jsonapi_client.exceptions import DocumentError
 from jsonapi_client.filter import Filter, Modifier
 from jsonapi_client.resourceobject import ResourceObject
 from oauthlib.oauth2 import OAuth2Token
 
 from ..env import API_BASE_URL
-from ..utils import filter_string_from_parameter
+from ..utils import filter_string_from_parameter, build_request_headers
 
 logger = logging.getLogger(__name__)
 
@@ -37,7 +37,7 @@ def get_inference(token: OAuth2Token,
   """
   with Session(API_BASE_URL,
                request_kwargs=dict(
-                   headers={'Authorization': f"{token['token_type']} {token['access_token']}"})) as session:
+                   headers=build_request_headers(token))) as session:
     try:
       filter_str_list = ','.join(list(filter(None, [
         filter_string_from_parameter('id', id),
@@ -64,7 +64,7 @@ def get_inference(token: OAuth2Token,
       merged_filters = sum(modifier_list, Modifier())
       logger.debug(merged_filters.url_with_modifiers(''))
 
-      logger.info(f'Fetching inferences... page size: {page_size}; page: {page_num}{"+" if page_fetch_follows else ""}')
+      logger.info(f'Fetching inferences... page size: {page_size}; page: {page_num}{" and following" if page_fetch_follows else ""}')
       inferences = session.get('inference', merged_filters)
       logger.info(f"Inferences matching query: {inferences.meta.count}")
 

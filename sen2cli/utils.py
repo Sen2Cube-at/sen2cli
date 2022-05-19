@@ -4,11 +4,25 @@ import logging
 from csv import DictWriter
 from typing import Final, List, Union
 
+import requests as req
+from  .__version__ import __version__
+
+import click
+import requests.utils
 from jsonapi_client.resourceobject import ResourceObject
 
-from .env import DEFAULT_DELIMITER
+from env import DEFAULT_DELIMITER
 
 logger = logging.getLogger(__name__)
+
+
+class S2CliCommandConfig(object):
+  def __init__(self):
+    self.tokenfile = None
+
+
+s2cli_command_config = click \
+  .make_pass_decorator(S2CliCommandConfig, ensure=True)
 
 
 def configure_logging(log_file: str = None, log_level: int = logging.WARNING) -> None:
@@ -22,18 +36,18 @@ def configure_logging(log_file: str = None, log_level: int = logging.WARNING) ->
 
   if log_file:
     log_handlers.append(
-        logging.FileHandler(log_file, mode="w")
+      logging.FileHandler(log_file, mode="w")
     )
   else:
     log_handlers.append(
-        logging.StreamHandler()  # defaults to strerr
+      logging.StreamHandler()  # defaults to strerr
     )
 
   logging.basicConfig(
-      format='%(asctime)s [%(levelname)s] - %(funcName)s:%(lineno)d - %(message)s',
-      level=log_level,
-      datefmt="%Y-%m-%d %H:%M:%S",
-      handlers=log_handlers
+    format='%(asctime)s [%(levelname)s] - %(funcName)s:%(lineno)d - %(message)s',
+    level=log_level,
+    datefmt="%Y-%m-%d %H:%M:%S",
+    handlers=log_handlers
   )
 
 
@@ -79,3 +93,11 @@ def filter_string_from_parameter(column: str, value: Union[str, int, List, tuple
   else:
     logger.error(f"Type not supported: {type(value)}")
     return None
+
+
+def build_request_headers(token):
+  headers = req.utils.default_headers()
+  headers.update({'User-Agent': f"sen2cli {__version__} ({headers['User-Agent']})",
+                  'Authorization': f"{token['token_type']} {token['access_token']}"
+                  })
+  return headers
