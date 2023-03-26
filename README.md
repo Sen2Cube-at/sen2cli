@@ -8,7 +8,7 @@ Commandline interface for Sen2Cube.at backend.
 
 ## 🔧 Installation
 
-### 🐍 Local Python envirionment
+### 🐍 Local Python environment
 
 Install latest commit from `main` in your current Python environment run
 ```bash
@@ -32,19 +32,47 @@ docker build -t sen2cli .
 You can specify a version / tag / commit ref via build args. E.g
 
 ```
-docker build --build-arg SEN2CLI_VERSION='v0.2.0' -t sen2cli .
+docker build --build-arg SEN2CLI_VERSION='main' -t sen2cli .
 ```
 
 To run the image and mount `./host_data` into `/home/sen2cli/host_data` run
+
+**Linux / MacOS**
+
+```shell
+docker run -it --rm --name sen2cli \
+  -v "$(pwd)/host_data:/home/sen2cli/host_data" \
+  sen2cli /bin/bash
 ```
-docker run -it --name sen2cli \
-  -v "$(pwd)"/host_data:/home/sen2cli/host_data \
+
+**Windows Powershell**
+
+```powershell
+docker run -it --rm --name sen2cli `
+  -v "${pwd}/host_data:/home/sen2cli/host_data" `
   sen2cli /bin/bash
 ```
 
 After you are done, you might want to remove the container.  
 ```
 docker rm sen2cli
+```
+
+## Run dev version in docker
+
+Build image as described above. Then run
+
+**Windows Powershell**
+```powerschell
+docker run -it --rm --name sen2cli `
+  -v "${pwd}:/home/sen2cli" `
+  sen2cli:dev /bin/bash
+```
+
+Once in the container install the package editable
+```shell
+pip install -e .
+export PATH=$HOME/.local/bin:$PATH
 ```
 
 ## 🔰 Basic Usage

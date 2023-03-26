@@ -15,6 +15,6 @@ RUN cd /home/sen2cli  \
     && . /home/sen2cli/.venv/sen2cli/bin/activate \
     && echo "source /home/sen2cli/.venv/sen2cli/bin/activate" >> /home/sen2cli/.bashrc \
     && pip install wheel \
-    && pip install "git+https://github.com/ZGIS/sen2cli.git@${SEN2CLI_VERSION}"
+    && pip install "git+https://github.com/Sen2Cube-at/sen2cli.git@${SEN2CLI_VERSION}"
 
 CMD . /home/sen2cli/.venv/sen2cli/bin/activate && exec python

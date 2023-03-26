@@ -77,3 +77,4 @@ fabric.properties
 
 host_data/
 dist/
+.local
