@@ -36,11 +36,17 @@ def configure_logging(log_file: str = None, log_level: int = logging.WARNING) ->
       handlers=log_handlers
   )
 
+def _get_or_none(res: ResourceObject, field_name: str) -> any:
+  try:
+    return res[field_name]
+  except KeyError as e:
+    logger.warning(f"Could not find '{field_name}' in Resource. Returning none.")
+    return None
 
 def dict_from_resource(res: ResourceObject, columns: List[str]) -> dict:
-  id = {'id': res.id}
-  ret = {col: res[col] for col in columns}
-  return {**id, **ret}
+  resource_id = {'id': res.id}
+  ret = {col: _get_or_none(res, col) for col in columns}
+  return {**resource_id, **ret}
 
 
 def csv_from_dictlist(list: List[dict], with_headers: bool = True) -> str:
