@@ -10,7 +10,7 @@ from setuptools import find_packages, setup
 # Package meta-data.
 NAME = 'sen2cli'
 DESCRIPTION = 'Sen2Cube.at commandline interface.'
-URL = 'https://github.com/ZGIS/sen2cli'
+URL = 'https://github.com/Sen2Cube-at/sen2cli'
 EMAIL = 'me@example.com'
 AUTHOR = 'Sen2Cube.at'
 REQUIRES_PYTHON = '>=3.8.0'

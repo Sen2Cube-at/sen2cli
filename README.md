@@ -1,5 +1,5 @@
 [![Project Status: WIP – Initial development is in progress, but there has not yet been a stable, usable release suitable for the public.](https://www.repostatus.org/badges/latest/wip.svg)](https://www.repostatus.org/#wip)
-[![Python Version: 3.8](https://img.shields.io/badge/Python-3.8-blue.svg)](https://www.github.com/ZGIS/sen2cli)
+[![Python Version: 3.8](https://img.shields.io/badge/Python-3.8-blue.svg)](https://www.github.com/Sen2cube-at/sen2cli)
 [![License: GNU General Public License 3.0 or later](https://img.shields.io/badge/License-GPLv3+-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 
 # Sen2Cube.at - Commandline interface
@@ -12,17 +12,17 @@ Commandline interface for Sen2Cube.at backend.
 
 Install latest commit from `main` in your current Python environment run
 ```bash
-pip install git+https://github.com/ZGIS/sen2cli.git@main
+pip install git+https://github.com/Sen2cube-at/sen2cli.git@main
 ```
 
 You can also specify a version instead of `@main` e.g.
 ```bash
-pip install git+https://github.com/ZGIS/sen2cli.git@v0.2.0
+pip install git+https://github.com/Sen2cube-at/sen2cli.git@v0.2.0
 ```
 
 ### 🐳 Docker
 
-Download [`Dockerfile`](https://github.com/ZGIS/sen2cli/blob/main/Dockerfile) from GitHub. To build the image for the
+Download [`Dockerfile`](https://github.com/Sen2cube-at/sen2cli/blob/main/Dockerfile) from GitHub. To build the image for the
 latest release version run
 
 ```
